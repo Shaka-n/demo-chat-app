@@ -1,0 +1,20 @@
+<!-- The list of messages will appear here: -->
+<div class="mt-[4rem]">
+<h1>JS Page</h1>
+  <ul id="msg-list" phx-update="append" class="pa-1"></ul>
+</div>
+
+<footer class="bg-slate-800 p-2 h-[3rem] bottom-0 w-full flex justify-center sticky mt-[auto]">
+  <div class="w-full flex flex-row items-center text-gray-700 focus:outline-none font-normal">
+    <input type="text" id="username" placeholder="Name" required
+        class="grow-0 w-1/6 px-1.5 py-1.5"/>
+
+    <input type="text" id="content" placeholder="Your message" required
+      class="grow w-2/3 mx-1 px-2 py-1.5"/>
+
+    <button id="send" class="text-white bold rounded px-3 py-1.5 w-fit
+        transition-colors duration-150 bg-sky-500 hover:bg-sky-600">
+      Send
+    </button>
+  </div>
+</footer>
