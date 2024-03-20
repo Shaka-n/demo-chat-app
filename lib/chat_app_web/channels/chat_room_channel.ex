@@ -1,6 +1,5 @@
 defmodule ChatAppWeb.ChatRoomChannel do
   use ChatAppWeb, :channel
-  alias Phoenix.PubSub
 
   require Logger
 
@@ -21,43 +20,29 @@ defmodule ChatAppWeb.ChatRoomChannel do
   end
 
   @impl true
-  def handle_in("new_message", payload, socket) do
-    broadcast(socket, "new_message", payload)
-    {:noreply, socket}
-  end
-
-  @impl true
   def handle_in("new_client_message", payload, socket) do
     broadcast(socket, "new_message", payload)
     {:noreply, socket}
   end
 
   @impl true
-  def handle_in("new_liveview_message", payload, socket) do
-    Logger.info("Receieved message in Channel: #{inspect(payload)}")
-    broadcast(socket, "new_message", payload)
-    {:noreply, socket}
-  end
-
-  @impl true
   def handle_in(event, payload, socket) do
-    Logger.info("New message in catchall handle_in: #{inspect(event)}")
+    Logger.info("New message in Channel Catchall. Event: #{inspect(event)}, Payload: #{inspect(payload)}")
     {:noreply, socket}
   end
 
-  # For handling internal broadcasts
+  # Generic PubSub broadcast handling
   @impl true
-  def handle_info(%{ event: "new_liveview_message", payload: message}, socket) do
-    Logger.info("Receieved new message in Channel from local broadcast: #{inspect(message)}")
-    # PubSub.broadcast(ChatApp.PubSub, "chat_room:lobby", %{event: "new_message", payload: message})
-    broadcast(socket, "new_message", message)
+  def handle_info(%{ event: "new_message", payload: message} = msg, socket) do
+    IO.inspect("Receieved new message in Channel from PubSub broadcast: #{inspect(msg)}")
+    IO.inspect(self(), label: "My PID: ")
+    push(socket, "new_message", message)
     {:noreply, socket}
   end
 
   @impl true
   def handle_info(msg, socket) do
-    Logger.info("Catchall Handle info in Channel Process: Message:#{inspect(msg)}")
-    Logger.info("Catcahll Handle Info in channel: Socket: #{inspect(socket)}")
+    IO.inspect("Catchall Handle info in Channel Process: Message:#{inspect(msg)}")
     {:noreply, socket}
   end
 

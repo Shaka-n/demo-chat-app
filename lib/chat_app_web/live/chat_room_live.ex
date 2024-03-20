@@ -10,7 +10,7 @@ defmodule ChatAppWeb.ChatRoomLive do
       <h3>Welcome to the Chat, <%= @current_user.username %></h3>
       <div id="chat-box">
         <%= for message <- @messages do %>
-          <p><strong><%= message.username %>:</strong> <%= message.content %></p>
+          <p><strong><%= message["username"] %>:</strong> <%= message["content"] %></p>
         <% end %>
       </div>
       <form phx-submit="submit_message">
@@ -26,9 +26,31 @@ defmodule ChatAppWeb.ChatRoomLive do
     {:ok, assign(socket, current_user: %{username: "Stefan"}, messages: [])}
   end
 
-  def handle_info(%{event: "new_message", payload: msg }, socket) do
-    Logger.info("Received new message from topic broadcast: #{inspect(msg)}")
-      {:noreply, update(socket, :messages, fn messages -> [ msg| messages] end)}
+  def handle_event("submit_message", %{"content" => content}, socket) do
+    PubSub.broadcast_from(ChatApp.PubSub, self(), "chat_room:lobby", %{ event: "new_message", sender_id: self(), payload: %{
+      "username" => socket.assigns.current_user.username,
+      "content" => content,
+      "inserted_at" => DateTime.utc_now()
+    }})
+
+    {:noreply, assign(socket, messages: [ %{"username"=> socket.assigns.current_user.username, "content" => content} | socket.assigns.messages])}
+  end
+
+  # Handling for LiveView Messages
+  def handle_info(%{event: "new_message", payload: %{sender_id: sender_id} = new_message }, socket) do
+    Logger.info("Received new message in LiveView: #{inspect(new_message)}")
+    # IO.inspect(self(), label: "My PID: ")
+    if self() == sender_id do
+      {:noreply, socket}
+    else
+      {:noreply, update(socket, :messages, fn messages -> [ new_message| messages] end)}
+    end
+  end
+
+  # Handling for Channel client messages
+  def handle_info(%{event: "new_message", payload: new_message } = msg, socket) do
+    Logger.info("Received new message in LiveView: #{inspect(msg)}")
+      {:noreply, update(socket, :messages, fn messages -> [ new_message| messages] end)}
   end
 
   def handle_info(msg, socket) do
@@ -36,21 +58,7 @@ defmodule ChatAppWeb.ChatRoomLive do
     {:noreply, socket}
   end
 
-  def handle_event("submit_message", %{"content" => content}, socket) do
-    PubSub.broadcast(ChatApp.PubSub, "chat_room:lobby", %{ event: "new_liveview_message", payload: %{
-      username: socket.assigns.current_user.username,
-      content: content,
-      inserted_at: DateTime.utc_now(),
-      pid: self() |> inspect() |> Jason.encode!
-    }})
-    # ChatAppWeb.Endpoint.broadcast("chat_room:lobby", "new_local_message", %{payload: %{
-    #   username: socket.assigns.current_user.username,
-    #   content: content,
-    #   pid: self()
-    # }})
-    {:noreply, socket}
-    # {:noreply, assign(socket, messages: [ %{username: socket.assigns.current_user.username, content: content} | socket.assigns.messages])}
-  end
+
 
   # defp message(%{"username" => username, "content" => content}) do
   #   %{"username" => username, "content" => content}

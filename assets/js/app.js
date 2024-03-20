@@ -93,8 +93,8 @@ function render_message(payload) {
 }
 
 // Listen for the [Enter] keypress event to send a message:
-content.addEventListener('keypress', function (event) {
-  if (event.keyCode == 13 && content.value.length > 0) { // don't sent empty msg.
+content.addEventListener('keydown', function (event) {
+  if (event.key == 'Enter' && content.value.length > 0) { // don't sent empty msg.
     sendMessage()
   }
 });
