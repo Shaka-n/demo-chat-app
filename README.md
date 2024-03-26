@@ -1,18 +1,10 @@
 # ChatApp
 
-To start your Phoenix server:
+This is a little sandbox experiment that I'm using to learn more about Phoenix, Channels, LiveView, and PubSub. The crux of the idea is having a browser-based chat application implemented with LiveView, while also allowing any external client to join a chat room. So far it only works with the official Phoenix JS client. You can read about my lessons learned on my blog [here](https://shaka-n.github.io/).
+
+To start thePhoenix server:
 
   * Run `mix setup` to install and setup dependencies
   * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
-
-## Learn more
-
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
